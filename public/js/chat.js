@@ -25,14 +25,14 @@ var Inbox = $('#messages'),// All messages in usre's file
  */
  
 // If Login unsuccessful
-socket.on('error login',function () {
+socket.on('SenderNotFound',function () {
 	chatNameSection.find('.form-group').addClass('has-error has-nickname-taken');
 });
 
 
 
 // Welcoming Loged In user
-socket.on('welcome', function(nickname, nicknames) {
+socket.on('Hello', function(nickname, nicknames) {
 
 	// Show Chat Area
 	chatNameSection.remove();
@@ -81,15 +81,18 @@ chatNameForm.on('submit', function(e){
 		chatNameSection.find('.form-group').addClass('has-error');
 	}
 });
-var validUser = true;
-	validUser =	socket.on('invalid user',function () {
-			chatInputForm.find(".form-group").addClass('has-error invalid-user');
-			return false;
-		});
+
 // Submit handler for message entry box
 chatInputForm.on('submit', function(e){
 	e.preventDefault();
-	validateAndSend(validUser);		
+	
+	var rcvr = $.trim($('#To').val());
+	if (rcvr != '') {
+		validateAndSend();
+	}else{
+		$("#To").addClass('has-error');
+	}
+	
 });
 
 // Trigger submit handler for message box programatically
@@ -110,8 +113,9 @@ messageTextBox.on('keypress', function(e) {
 });
 
 // Remove error when input is being typed in
-chatNameSection.find('#name').on('keypress', function(e) {
+$('#name,#To').on('keypress', function(e) {
 	chatNameSection.find('.has-error').removeClass('has-error').removeClass('has-nickname-taken');
+	chatInputSection.find('.has-error').removeClass('has-error').removeClass('invalid-user');
 });
 
 
@@ -133,10 +137,20 @@ function appendAndScroll (html) {
 	// Plays sound if its not already playing
 	chatSound.play();
 }
-	
+//When ivalid user
+socket.on('UserNotHere',function () {
+	chatInputForm.find(".form-group").addClass('has-error invalid-user');
+	messageTextBox.val('');
+	$('#To').val('');
+	alert('Message not Sended :(');
+});
+socket.on('‫‪MsgRcvd‬‬',function () {
+	messageTextBox.val('');
+	alert('Message Sended ;)');
+});
 
 // Validate and send messages
-function validateAndSend (IsvalidUser) {
+function validateAndSend () {
 	var chatMessage = $.trim(messageTextBox.val());
 	var senderUser = chatNameSection.find('#name').val();
 	var Reciver = $("#To").val();
@@ -145,19 +159,14 @@ function validateAndSend (IsvalidUser) {
 	//show error for sending message to invalid user 
 	
 	//alert(chatMessage +' rec: '+ Reciver +' sndr:'+ senderUser);
-	alert(IsvalidUser);
-	if(chatMessage != '' && IsvalidUser) {
-		socket.emit('outgoing', { message: sanitize(chatMessage) ,
+	if(chatMessage != '') {
+		socket.emit('Msg4', { message: sanitize(chatMessage) ,
 								  reciver: Reciver,
 								  sender : senderUser
 		});
-		alert('Server : Your message sended successfuly! ;)');
+
 		// Clear chat text box after message success
 		messageTextBox.val('');
-	}else{
-		alert('invalid user: FAIL to send Message :(');
-		messageTextBox.val('');
-		$('#To').val('');
 	}
 };
 

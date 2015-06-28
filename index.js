@@ -40,21 +40,21 @@ io.sockets.on('connection', function (socket) {
 			}
 		});
 		if (!login) {
-			socket.emit('error login');
+			socket.emit('SenderNotFound');
 		} else {
 			socket.set("login", data.name, function () {
 				// Update 'nicknames' array
 				nicknames.push(data.nickname);
 				
 				// Welcome the user who joined
-				socket.emit('welcome', data.nickname, nicknames);
+				socket.emit('Hello', data.nickname, nicknames);
 			});
 		}
 
 	});
 
     // Listening for chat messages being sent
-	socket.on('outgoing', function (data) {
+	socket.on('Msg4', function (data) {
 
 				var nickname =  data.sender;
 				var message  = data.message;
@@ -64,39 +64,18 @@ io.sockets.on('connection', function (socket) {
 				return   reciver === username;
 			});
 			if (ExistUser.toString().length === 0) {
-				socket.emit('invalid user');
+				socket.emit('UserNotHere');
 				console.log('--'+'invalid user');
 			}else{
-				socket.set('valid user',function () {
-					socket.emit('success');
-				});
-			
+				
 			//sending message...
-			var messages = '\nFrom '+ nickname + '\n'+message+'\n--------';
+			var messages = 'From '+ nickname + '\n'+message+'\n--------\n';
 			fs.appendFile('DB/'+reciver+'.txt', messages, function (err) {
 						  if (err) throw err;
 						  console.log('Your message is\n'+message + 'Sended');
+						  socket.emit('‫‪MsgRcvd‬‬');
 						});
-				}
-			
-	});
-
-    // Listening for when someone leaves - native listener for socket.io
-	socket.on('disconnect', function () {
-
-		socket.get('nickname', function (err, nickname) {
-
-			// Remove username from users
-			nicknames.splice(nicknames.indexOf(nickname), 1);
-
-            // Don't need to broadcast if there are no users left
-			if (nicknames.length === 0) return;
-
-            // Notify existing users that someone left
-			socket.broadcast.emit('user left', nickname, nicknames);
-		});
-
-		console.log('user disconnected!');
+				}	
 	});
 });
 
