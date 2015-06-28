@@ -5,15 +5,15 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 		<title>Node Chat</title>
 		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/css/bootstrap.min.css">
 		<!-- Optional theme from http://bootswatch.com/ -->
-		<link rel="stylesheet" href="http://bootswatch.com/flatly/bootstrap.min.css">
+		<link rel="stylesheet" href="/css/faltly.min.css">
 		<!-- Custom Theme changes -->
 		<link rel="stylesheet" href="/css/main.css">
 		<!-- jQuery needed -->
 		<script src="/js/jquery.min.js"></script>
 		<!-- Latest compiled and minified JavaScript -->
-		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
 	</head>
 	<body>
 		<!-- Login input form - takes a name before initiating chat -->
@@ -47,7 +47,9 @@
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12">
-						<h1>Chat App</h1>
+						<div id="username">
+							<!--Hello {to loged In user}-->
+						</div>
 					</div>
 				</div>
 			</div>
@@ -57,20 +59,25 @@
 					<form class="bs-component" id="chatInputForm">
 						<div class="col-md-6 col-sm-12">
 							<label for="To">To:</label>
-							<select class="form-control" id="To">
-								<option>nodejs ^^</option>
-							</select>
+							<input class="form-control" type="text" id="To">
 							<label for="messageTextBox">Message:</label>
 							<textarea class="form-control" id="messageTextBox"></textarea>
 							<br>
-							<button type="submit" class="btn btn-success btn-md btn-block" id="chatSendBtn">Send</button>
+							<button type="submit" class="btn btn-warning btn-md btn-block" id="chatSendBtn">
+								<b>Send</b>
+								</button>
+								<div class="input-group">
+								<p>
+									<span class="text-danger">
+										invalid username: Your message failed to send !
+									</span>
+								</p>
+							</div>
 						</div>
 						<div class="col-md-6">
-							<div class="panel panel-primary">
+							<div class="panel panel-default">
 								<div class="panel-heading">
-									<div id="username">
-										<!--Hello {user}-->
-									</div>
+									<h6>Your Inbox:</h6>
 								</div>
 								<div class="panel-body" id="messages"></div>
 							</div>

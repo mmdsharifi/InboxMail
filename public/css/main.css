@@ -1,26 +1,31 @@
 /**
  * Mixins
  */
+ body{
+   background-color: #448AFF;
+   color: #FFF;
+ }
+ select,input,textarea{
+   background-color: #fff !important;
+   color:#000;  
+ }
+ .text-black{
+   color:#000;
+ }
 #user span {
   text-transform: uppercase;
 }
 
-.chat-name-section .text-danger {
+.chat-input-section .text-danger, .chat-name-section .text-danger {
   display: none;
 }
-.chat-name-section .has-nickname-taken .text-danger {
+.chat-input-section .invalid-user .text-danger ,.chat-name-section .has-nickname-taken .text-danger {
   display: block;
 }
 
 .chat-input-section,
 .chat-box-section {
   display: none;
-}
-
-#usersOnlineBtn {
-  position: absolute;
-  right: 15px;
-  top: -55px;
 }
 
 #chatBox {

@@ -20,9 +20,8 @@ var nicknames = [];
 //Read Users name and password from file
 var users = fs.readFileSync('DB/users.txt').toString();
 var user = users.split(',');
-console.log(user);
-
 nicknames = user;
+
 
 io.sockets.on('connection', function (socket) {
 
@@ -38,7 +37,6 @@ io.sockets.on('connection', function (socket) {
 					login = true;
 					return;
 				}
-
 			}
 		});
 		if (!login) {
@@ -58,21 +56,29 @@ io.sockets.on('connection', function (socket) {
     // Listening for chat messages being sent
 	socket.on('outgoing', function (data) {
 
-		socket.get('nickname', function (err, nickname) {
-			var eventArgs = {
-				nickname: nickname,
-				message: data.message,
-				reciver: data.reciver
-			};
-			console.log('-----------------------------> ' + data.message + ' ' + nickname);
-            // You can either use the code below
-            // to send messages to all clients...
-			//io.sockets.emit('incoming', nameAndData, null);
-
-            // ...Or you can use these lines for better flexibility
-			socket.emit('incoming', eventArgs, true);
-			socket.broadcast.emit('incoming', eventArgs, false);
-		});
+				var nickname =  data.sender;
+				var message  = data.message;
+				var reciver = data.reciver;
+			
+			var ExistUser = nicknames.filter(function (username) {
+				return   reciver === username;
+			});
+			if (ExistUser.toString().length === 0) {
+				socket.emit('invalid user');
+				console.log('--'+'invalid user');
+			}else{
+				socket.set('valid user',function () {
+					socket.emit('success');
+				});
+			
+			//sending message...
+			var messages = '\nFrom '+ nickname + '\n'+message+'\n--------';
+			fs.appendFile('DB/'+reciver+'.txt', messages, function (err) {
+						  if (err) throw err;
+						  console.log('Your message is\n'+message + 'Sended');
+						});
+				}
+			
 	});
 
     // Listening for when someone leaves - native listener for socket.io

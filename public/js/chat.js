@@ -1,6 +1,5 @@
 (function($){
 
-
 // window.location.origin polyfill support for IE
 if (!window.location.origin) {window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');}
 
@@ -18,26 +17,21 @@ var chatNameForm = $('#chatNameForm'),//login Form
 var Inbox = $('#messages'),// All messages in usre's file
 	messageTextBox = $('#messageTextBox');// a textbox for write user's message
 
-var modalPopupBtn = $('#usersOnlineBtn'),
-	usersOnlineCounter = modalPopupBtn.find('.badge');
 
 
 
 /**
  * Socket Events
  */
+ 
 // If Login unsuccessful
-
 socket.on('error login',function () {
 	chatNameSection.find('.form-group').addClass('has-error has-nickname-taken');
 });
 
-// If name already exists
-/*socket.on('nickname taken', function() {
-	chatNameSection.find('.form-group').addClass('has-error has-nickname-taken');
-});
-*/
-// Welcoming signed in user
+
+
+// Welcoming Loged In user
 socket.on('welcome', function(nickname, nicknames) {
 
 	// Show Chat Area
@@ -45,40 +39,19 @@ socket.on('welcome', function(nickname, nicknames) {
 	chatBoxSection.show(500);
 	chatInputSection.show(500);
 
-	chatBoxSection.$("#username").html('Hello, <span class="text-success">' + nickname + '</span>');
+	$("#username").html('<h2>Hello, <span>' + nickname + '!</span></h2>');
 
 	// Update users list
 	updateUsers(nicknames);
 });
 
-// Broadcast to rest of chat that user has joined
-socket.on('user joined', function(nickname, nicknames) {
-	var userJoinedMessage = '<p class="text-primary"><em><u>' + nickname + '</u> has joined the chat.</em></p>';
-
-	// Append to chat box and scroll to latest message
-	appendAndScroll(userJoinedMessage);
-
-	// Update users list
-	updateUsers(nicknames);
-});
-
-// Broadcast to rest of chat that user has left
-socket.on('user left', function(nickname, nicknames) {
-	var userLeftMessage = '<p class="text-warning"><em>' + nickname + ' has left the chat.</em></p>';
-
-	// Append to chat box and scroll to latest message
-	appendAndScroll(userLeftMessage);
-
-	// Update users list
-	updateUsers(nicknames);
-});
 
 // Display incoming messages on screen
 socket.on('incoming', function(data, self) {
 
 	var nickname = self ? 'You' : data.nickname;
 	var self = self ? 'self' : '';
-	var receivedMessage = '<p class="entry ' + self + '"><b class="text-primary">' + nickname + ' said: </b>' + data.message + '</p>';
+	var receivedMessage = '<p class="entry ' + self + '"><b class="text-primary">' + nickname + ' said: </b><span class="text-black" >' + data.message + '</span></p>';
 
 	// Append to chat box and scroll to latest message
 	appendAndScroll(receivedMessage);
@@ -90,7 +63,7 @@ socket.on('incoming', function(data, self) {
  * UI Events
  */
 
-// Submit handler for name entry box
+// Submit handler for Login
 chatNameForm.on('submit', function(e){
 
 	e.preventDefault();
@@ -108,13 +81,15 @@ chatNameForm.on('submit', function(e){
 		chatNameSection.find('.form-group').addClass('has-error');
 	}
 });
-
+var validUser = true;
+	validUser =	socket.on('invalid user',function () {
+			chatInputForm.find(".form-group").addClass('has-error invalid-user');
+			return false;
+		});
 // Submit handler for message entry box
 chatInputForm.on('submit', function(e){
 	e.preventDefault();
-	var ToReciver = $("To").find(':selected').text();
-	alert(ToReciver);
-	validateAndSend(ToReciver);		
+	validateAndSend(validUser);		
 });
 
 // Trigger submit handler for message box programatically
@@ -158,19 +133,31 @@ function appendAndScroll (html) {
 	// Plays sound if its not already playing
 	chatSound.play();
 }
+	
 
 // Validate and send messages
-function validateAndSend (Reciver) {
+function validateAndSend (IsvalidUser) {
 	var chatMessage = $.trim(messageTextBox.val());
+	var senderUser = chatNameSection.find('#name').val();
+	var Reciver = $("#To").val();
 	
-	alert(chatMessage + Reciver);
-	
-	if(chatMessage != '') {
-		socket.emit('outgoing', { message: sanitize(chatMessage) ,
-								  reciver: Reciver});
 
+	//show error for sending message to invalid user 
+	
+	//alert(chatMessage +' rec: '+ Reciver +' sndr:'+ senderUser);
+	alert(IsvalidUser);
+	if(chatMessage != '' && IsvalidUser) {
+		socket.emit('outgoing', { message: sanitize(chatMessage) ,
+								  reciver: Reciver,
+								  sender : senderUser
+		});
+		alert('Server : Your message sended successfuly! ;)');
 		// Clear chat text box after message success
 		messageTextBox.val('');
+	}else{
+		alert('invalid user: FAIL to send Message :(');
+		messageTextBox.val('');
+		$('#To').val('');
 	}
 };
 
@@ -180,11 +167,11 @@ function updateUsers (nicknames) {
 	// bind users in Database to dropdown list
 	var users ;
 	for(var i=0; i< nicknames.length-1; i++) {
-		if (i%2 == 0 && nicknames[i].length !=0 ) {
-			users+= '<option>' + nicknames[i] + '</option>';
+		if (i%2 == 0 && nicknames[i].length !==0 ) {
+			users+= '<li><a href="#">' + nicknames[i] + '</a></li>';
 		}		
 	}
-	
+	//<li><a href="#">Action</a></li>
 	// Update users box
 	$('#To').html(users);
 }
