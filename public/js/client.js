@@ -46,18 +46,6 @@ socket.on('Hello', function(nickname, nicknames) {
 });
 
 
-// Display incoming messages on screen
-socket.on('incoming', function(data, self) {
-
-	var nickname = self ? 'You' : data.nickname;
-	var self = self ? 'self' : '';
-	var receivedMessage = '<p class="entry ' + self + '"><b class="text-primary">' + nickname + ' said: </b><span class="text-black" >' + data.message + '</span></p>';
-
-	// Append to chat box and scroll to latest message
-	appendAndScroll(receivedMessage);
-});
-
-
 
 /**
  * UI Events
@@ -68,14 +56,14 @@ chatNameForm.on('submit', function(e){
 
 	e.preventDefault();
 
-	var chatName = $.trim( chatNameSection.find('#name').val() );
-    var chatPass = $.trim( chatNameSection.find('#pass').val() );
+	var UserName = $.trim( chatNameSection.find('#name').val() );
+    var UserPass = $.trim( chatNameSection.find('#pass').val() );
 	
-	if(chatName != '' && chatPass != '') {
+	if(UserName != '' && UserPass != '') {
         // Emit valid entry to server
         // for validation against nicknames array
-		socket.emit('new user', { nickname: sanitize(chatName),
-								  password: sanitize(chatPass)
+		socket.emit('‫‪HelloFrom‬‬', { nickname: sanitize(UserName),
+								  password: sanitize(UserPass),
 		 });
 	} else {
 		chatNameSection.find('.form-group').addClass('has-error');
@@ -175,6 +163,7 @@ function validateAndSend () {
 
 		// Clear chat text box after message success
 		messageTextBox.val('');
+		socket.emit('‫‪MsgEnd‬‬');
 	}
 };
 

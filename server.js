@@ -2,7 +2,7 @@
 /**
  * Module dependencies.
  */
-
+// Create a Server and set a port
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
@@ -20,19 +20,19 @@ var nicknames = [];
 //Read Users name and password from file
 var users = fs.readFileSync('DB/users.txt').toString();
 var user = users.split(',');
-user.pop();//remove last
+user.pop();//remove last elemet;beacause it's empty
 nicknames = user;
 console.log(nicknames);
 
 io.sockets.on('connection', function (socket) {
 
     // When user enters name from the client
-	socket.on('new user', function (data) {
+	socket.on('‫‪HelloFrom‬‬', function (data) {
 
-		//var login;
+		//var login to endshoure
 		var login = false;
 		nicknames.forEach(function (name, index) {
-			console.log(name + nicknames[index + 1] + " " + data.nickname + "  " + data.password);
+
 			if ((name.toLowerCase() === data.nickname.toLowerCase())) {
 				if (nicknames[index + 1].toLowerCase() === data.password.toLowerCase()) {
 					login = true;
@@ -47,7 +47,7 @@ io.sockets.on('connection', function (socket) {
 				// Update 'nicknames' array
 				nicknames.push(data.nickname);
 				
-				// Welcome the user who joined
+				// Server Say Hello to user
 				socket.emit('Hello', data.nickname, nicknames);
 			});
 		}
@@ -65,10 +65,11 @@ io.sockets.on('connection', function (socket) {
 				return   reciver === username;
 			});
 			if (ExistUser.toString().length === 0) {
-				socket.emit('UserNotHere');
-				console.log('--'+'invalid user');
+				socket.emit('UserNotHere');//say to clien this user not here!
+				console.log('UserNotHere');
 			}else{
-				
+			socket.emit('OK');	// Server Say OK
+			console.log('OK');
 			//sending message...
 			var messages = 'From '+ nickname + '\n'+message+'\n--------\n';
 			fs.appendFile('DB/'+reciver+'.txt', messages, function (err) {
@@ -79,6 +80,7 @@ io.sockets.on('connection', function (socket) {
 				}	
 	});
 	
+	// Get all messages in user's inbox	
 	socket.on('GiveMyMsg',function (data) {
 		var user = data.me;
 		//var users = fs.readFileSync('DB/'+ user +'.txt').toString();
