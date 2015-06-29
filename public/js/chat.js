@@ -118,14 +118,23 @@ $('#name,#To').on('keypress', function(e) {
 	chatInputSection.find('.has-error').removeClass('has-error').removeClass('invalid-user');
 });
 
+$('#show-all-msg').on('click',function () {
+	var senderUser = chatNameSection.find('#name').val();
+	$(this).fadeOut( "slow" );
+	socket.emit('GiveMyMsg', { me: senderUser
+		 });
+});
 
+socket.on('allmsg',function (msg) {
+	appendAndScroll('<pre>'+ msg+'</pre>');
+})
 /**
- * Helper functions
+ * Helper functions	
  */
 
 // Convert html tags into literal strings
 function sanitize (input) {
-	return input.replace(/>/g, '&gt;').replace(/</g,'&lt;').replace('\n','<br/>');
+	return input.replace(/(?:\r\n|\r|\n)/g, '<br>');;
 }
 
 // Appends messages to chat box and scroll down
@@ -152,9 +161,8 @@ socket.on('‫‪MsgRcvd‬‬',function () {
 // Validate and send messages
 function validateAndSend () {
 	var chatMessage = $.trim(messageTextBox.val());
-	var senderUser = chatNameSection.find('#name').val();
 	var Reciver = $("#To").val();
-	
+	var senderUser = chatNameSection.find('#name').val();
 
 	//show error for sending message to invalid user 
 	

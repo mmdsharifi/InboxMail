@@ -20,16 +20,17 @@ var nicknames = [];
 //Read Users name and password from file
 var users = fs.readFileSync('DB/users.txt').toString();
 var user = users.split(',');
+user.pop();//remove last
 nicknames = user;
-
+console.log(nicknames);
 
 io.sockets.on('connection', function (socket) {
 
     // When user enters name from the client
 	socket.on('new user', function (data) {
 
-		//var nicknameTaken;
-		var login;
+		//var login;
+		var login = false;
 		nicknames.forEach(function (name, index) {
 			console.log(name + nicknames[index + 1] + " " + data.nickname + "  " + data.password);
 			if ((name.toLowerCase() === data.nickname.toLowerCase())) {
@@ -76,6 +77,17 @@ io.sockets.on('connection', function (socket) {
 						  socket.emit('‫‪MsgRcvd‬‬');
 						});
 				}	
+	});
+	
+	socket.on('GiveMyMsg',function (data) {
+		var user = data.me;
+		//var users = fs.readFileSync('DB/'+ user +'.txt').toString();
+		 fs.readFile('DB/'+ user +'.txt', function (err, msg) {
+					  if (err) throw err;
+ 					  console.log(msg.toString());
+					  socket.emit('allmsg',msg.toString());
+			});
+		
 	});
 });
 
